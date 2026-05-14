@@ -1,6 +1,6 @@
-const mullter = require('multer');
+const multer = require('multer');
 
-const storage = mullter.memoryStorage();
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/gif'];
@@ -11,6 +11,6 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = mullter({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
-module.exports = { uploadMiddleware: upload.single('image') };
+module.exports = { uploadMiddleware: upload.single('image') };

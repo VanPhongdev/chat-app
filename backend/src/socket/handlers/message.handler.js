@@ -7,51 +7,53 @@ const registerMessageHandlers = (io, socket) => {
     // Gửi tin nhắn
     socket.on('send_message', async ({ roomId, content, type = 'text', file_url = '' }) => {
         try {
-            // Luu tin nhắn vào database
+            // Lưu tin nhắn vào database
             const message = await Message.create({
                 room: roomId,
                 sender: userId,
                 content,
                 type,
-                file_url
+                file_url,
             });
 
-            // Điền thong tin người gửi để trả về client
+            // Điền thông tin người gửi để trả về client
             await message.populate('sender', 'full_name avatar');
 
             // Cập nhật last_message cho phòng
-            await Room.findByIdAndUpdate(roomId, { 
+            await Room.findByIdAndUpdate(roomId, {
                 last_message: {
                     content,
                     sender: userId,
                     created_at: message.createdAt,
                 },
-             });
+            });
 
-             // Phát tin nhắn đến tất cả thành viên trong phòng
-             io.to(roomId).emit('new_message', message);
+            // Phát tin nhắn đến tất cả thành viên trong phòng
+            io.to(roomId).emit('new_message', message);
         } catch (error) {
-            socket.emit('error', {'message': error.message});
+            socket.emit('error', { message: error.message });
         }
     });
 
-    socket.on('typing', ({ roomId, isTyping }) => {
-        socket.to(roomId).emit('user-typing', { userId, roomId });
+    // Đang gõ
+    socket.on('typing', ({ roomId }) => {
+        socket.to(roomId).emit('user_typing', { userId, roomId });
     });
 
+    // Ngừng gõ
     socket.on('stop_typing', ({ roomId }) => {
-        socket.to(roomId).emit('user-stop-typing', { userId, roomId });
+        socket.to(roomId).emit('user_stop_typing', { userId, roomId });
     });
 
     // Đánh dấu tin nhắn đã đọc
-    socket.on('mark_read', async ({ roomId }) => {
+    socket.on('mark_read', async ({ roomId, messageId }) => {
         try {
-            await Message.findByIdAndUpdate( messageId, {
-                $addToSet: { read_by: userId }
+            await Message.findByIdAndUpdate(messageId, {
+                $addToSet: { read_by: userId },
             });
-            socket.to(roomId).emit('messages_read', { messageId, roomId });
+            socket.to(roomId).emit('messages_read', { messageId, roomId, userId });
         } catch (error) {
-            socket.emit('error', {'message': error.message});
+            socket.emit('error', { message: error.message });
         }
     });
 };

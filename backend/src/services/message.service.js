@@ -5,7 +5,7 @@ const getMessages = async (roomId, { page = 1, limit = 30 }) => {
 
     const messages = await Message.find({ room: roomId, is_deleted: false })
         .populate('sender', 'full_name avatar')
-        .sort({ created_at: -1 })
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit));
 
