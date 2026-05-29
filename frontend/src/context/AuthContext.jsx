@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { authApi } from '../api/auth.api';
 import { connectSocket, disconnectSocket } from '../socket/socket';
@@ -12,6 +13,20 @@ export function AuthProvider({ children }) {
     } catch { return null; }
   });
   const [loading, setLoading] = useState(false);
+
+  const logout = useCallback(async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    try {
+      if (refreshToken) await authApi.logout(refreshToken);
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    disconnectSocket();
+    setUser(null);
+  }, []);
 
   // Use a ref so the event listener always calls the latest logout()
   const logoutRef = useRef(null);
@@ -61,16 +76,6 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const logout = useCallback(async () => {
-    const refreshToken = localStorage.getItem('refreshToken');
-    try { if (refreshToken) await authApi.logout(refreshToken); } catch {}
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    disconnectSocket();
-    setUser(null);
   }, []);
 
   return (

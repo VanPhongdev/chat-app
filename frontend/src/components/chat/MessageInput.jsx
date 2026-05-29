@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { messageApi } from '../../api/message.api';
 
-export default function MessageInput({ onSend, onTyping, roomId, disabled }) {
+export default function MessageInput({ onSend, onTyping, disabled }) {
   const [text, setText] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);

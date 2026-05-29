@@ -22,7 +22,7 @@ export default function FriendRequests({ onClose, onAccepted }) {
     fetchRequests();
   }, []);
 
-  const handleAccept = async (requestId, senderId) => {
+  const handleAccept = async (requestId) => {
     setResponding(prev => ({ ...prev, [requestId]: 'accepting' }));
     try {
       await friendApi.acceptRequest(requestId);

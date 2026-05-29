@@ -1,17 +1,6 @@
 const Room = require('../models/Room');
 const User = require('../models/User');
 
-const createRoom = async ({name, description, type}, userId) => {
-    const room = await Room.create ({
-        name,
-        description,
-        type,
-        members: [{ user: userId, role: 'admin' }],
-        created_by: userId,
-    });
-    return room;
-};
-
 const findOrCreateDirectRoom = async (friendId, userId) => {
     if (!friendId) {
         const error = new Error('Friend ID is required');
@@ -122,7 +111,6 @@ const leaveRoom = async (roomId, userId) => {
 };
 
 module.exports = {
-    createRoom,
     findOrCreateDirectRoom,
     getRooms,
     getRoomById,

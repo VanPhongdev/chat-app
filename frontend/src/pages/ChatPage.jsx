@@ -68,6 +68,28 @@ export default function ChatPage() {
     }
   };
 
+  const handleMessageReceived = (msg, roomId) => {
+    const createdAt = msg.createdAt || msg.created_at || msg.created_at || new Date().toISOString();
+    setRooms((prev) => {
+      const idx = prev.findIndex((r) => r._id === roomId);
+      if (idx === -1) {
+        const newRoom = {
+          _id: roomId,
+          name: msg.room_name || msg.room || 'Cuộc trò chuyện',
+          avatar: '',
+          type: 'direct',
+          last_message: { content: msg.content, sender: msg.sender, created_at: createdAt },
+        };
+        return [newRoom, ...prev];
+      }
+
+      const room = prev[idx];
+      const updated = { ...room, last_message: { content: msg.content, sender: msg.sender, created_at: createdAt } };
+      const copy = prev.filter((r) => r._id !== roomId);
+      return [updated, ...copy];
+    });
+  };
+
   const handleFriendsUpdated = () => {
     setFriendsRefresh(prev => prev + 1);
   };
@@ -92,7 +114,7 @@ export default function ChatPage() {
               loading={loadingRooms}
             />
 
-            <ChatWindow room={activeRoom} />
+            <ChatWindow room={activeRoom} onMessageReceived={handleMessageReceived} />
 
             <OnlineFriends refreshTrigger={friendsRefresh} onSelectFriend={handleFriendSelect} />
           </>

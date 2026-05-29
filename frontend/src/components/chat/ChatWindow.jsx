@@ -7,7 +7,7 @@ import Avatar from '../common/Avatar';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 
-export default function ChatWindow({ room }) {
+export default function ChatWindow({ room, onMessageReceived }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -53,6 +53,7 @@ export default function ChatWindow({ room }) {
 
     const onNewMessage = (msg) => {
       setMessages((prev) => [...prev, msg]);
+      onMessageReceived?.(msg, room._id);
     };
     const onTyping = ({ userId }) => {
       if (userId !== myId)
@@ -74,7 +75,7 @@ export default function ChatWindow({ room }) {
       socket.off('user_stop_typing', onStopTyping);
       setTypingUsers([]);
     };
-  }, [room, user?.id]);
+  }, [room, user?.id, onMessageReceived]);
 
   // Auto-scroll
   useEffect(() => {
@@ -190,4 +191,5 @@ export default function ChatWindow({ room }) {
 
 ChatWindow.propTypes = {
   room: PropTypes.object,
+  onMessageReceived: PropTypes.func,
 };
