@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth.routes');
 const messageRoutes = require('./routes/message.routes');
 const roomRoutes = require('./routes/room.routes');
+const friendRoutes = require('./routes/friend.routes');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use(limiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/rooms', roomRoutes);
+app.use('/api/friends', friendRoutes);
 
 // 404 handler
 app.use((req, res) => {

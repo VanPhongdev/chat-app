@@ -1,9 +1,15 @@
 const router = require('express').Router();
 const verifyToken = require('../middlewares/auth.middleware');
 const {
-    createRoom, getRooms, getRoomById, joinRoom, leaveRoom
+    createRoom,
+    getOrCreateDirectRoom,
+    getRooms,
+    getRoomById,
+    joinRoom,
+    leaveRoom
 } = require('../controllers/room.controller');
 
+router.post('/direct', verifyToken, getOrCreateDirectRoom);
 router.post('/', verifyToken, createRoom);
 router.get('/', verifyToken, getRooms);
 router.get('/:id', verifyToken, getRoomById);

@@ -44,7 +44,7 @@ const login = async ({ email, password }) => {
   // 3. Cập nhật trạng thái online
   user.is_online = true;
   user.last_seen = new Date();
-  await user.save();
+  await user.save({ validateBeforeSave: false });
 
   // 4. Tạo token pair
   const payload = { id: user._id.toString(), email: user.email };

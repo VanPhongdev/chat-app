@@ -1,4 +1,5 @@
 const Room = require('../models/Room');
+const User = require('../models/User');
 
 const createRoom = async ({name, description, type}, userId) => {
     const room = await Room.create ({
@@ -11,10 +12,55 @@ const createRoom = async ({name, description, type}, userId) => {
     return room;
 };
 
+const findOrCreateDirectRoom = async (friendId, userId) => {
+    if (!friendId) {
+        const error = new Error('Friend ID is required');
+        error.status = 400;
+        throw error;
+    }
+    if (friendId.toString() === userId.toString()) {
+        const error = new Error('Cannot create direct room with yourself');
+        error.status = 400;
+        throw error;
+    }
+
+    const rooms = await Room.find({
+        type: 'direct',
+        'members.user': { $all: [userId, friendId] },
+    });
+
+    const existingRoom = rooms.find((room) => room.members.length === 2);
+    if (existingRoom) {
+        await existingRoom.populate('members.user', 'full_name avatar is_online last_seen');
+        return existingRoom;
+    }
+
+    const friendUser = await User.findById(friendId).select('full_name avatar is_online last_seen');
+    if (!friendUser) {
+        const error = new Error('Friend not found');
+        error.status = 404;
+        throw error;
+    }
+
+    const room = await Room.create({
+        name: friendUser.full_name,
+        avatar: friendUser.avatar || '',
+        type: 'direct',
+        members: [
+            { user: userId, role: 'admin' },
+            { user: friendId, role: 'member' },
+        ],
+        created_by: userId,
+    });
+
+    await room.populate('members.user', 'full_name avatar is_online last_seen');
+    return room;
+};
+
 const getRooms = async (userId) => {
     return Room.find({ 'members.user': userId })
         .select('name description type avatar last_message members')
-        .sort({ 'last_message.created_at': 1 });
+        .sort({ 'last_message.created_at': -1, updatedAt: -1 });
 };
 
 const getRoomById = async (roomId, userId) => {
@@ -77,6 +123,7 @@ const leaveRoom = async (roomId, userId) => {
 
 module.exports = {
     createRoom,
+    findOrCreateDirectRoom,
     getRooms,
     getRoomById,
     joinRoom,

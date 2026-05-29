@@ -7,6 +7,13 @@ const createRoom = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+const getOrCreateDirectRoom = async (req, res, next) => {
+  try {
+    const room = await roomService.findOrCreateDirectRoom(req.body.friendId, req.user.id);
+    res.status(200).json(room);
+  } catch (error) { next(error); }
+};
+
 const getRooms = async (req, res, next) => {
     try {
         const rooms = await roomService.getRooms(req.user.id);
@@ -35,4 +42,4 @@ const leaveRoom = async (req, res, next) => {
     } catch (error) { next(error); }
 };
 
-module.exports = { createRoom, getRooms, getRoomById, joinRoom, leaveRoom };
+module.exports = { createRoom, getOrCreateDirectRoom, getRooms, getRoomById, joinRoom, leaveRoom };
