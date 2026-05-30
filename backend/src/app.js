@@ -1,5 +1,5 @@
-const express = require('express');
 const cors = require('cors');
+const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
@@ -16,12 +16,22 @@ app.use(helmet());
 // Parse allowed origins from CLIENT_URL env var (comma-separated)
 const allowedOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(',').map(url => url.trim())
-  : ['*'];
+  : [];
 
 app.use(cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
 }));
+
+app.options("*", cors());
 
 // Body parser
 app.use(express.json());
