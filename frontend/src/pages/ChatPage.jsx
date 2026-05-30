@@ -29,6 +29,7 @@ export default function ChatPage() {
       }
     };
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadRooms();
   }, []);
 

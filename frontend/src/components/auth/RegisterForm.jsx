@@ -27,11 +27,13 @@ export default function RegisterForm() {
       return;
     }
     const result = await register(form);
+    console.log('Register result:', result);
     if (result.success) {
       setSuccess(true);
       setTimeout(() => navigate('/login'), 1500);
     } else {
-      setError(result.message);
+      setError(result.message || 'Đăng ký thất bại');
+      console.error('Register error:', result);
     }
   };
 

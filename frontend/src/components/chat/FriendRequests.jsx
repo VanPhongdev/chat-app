@@ -74,7 +74,7 @@ export default function FriendRequests({ onClose, onAccepted }) {
                   <button
                     type="button"
                     className="btn-accept"
-                    onClick={() => handleAccept(request._id, request.sender._id)}
+                    onClick={() => handleAccept(request._id)}
                     disabled={responding[request._id]}
                   >
                     {responding[request._id] === 'accepting' ? '...' : '✓'}

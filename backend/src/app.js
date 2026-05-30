@@ -13,8 +13,14 @@ const app = express();
 // Security middlewares
 app.use(helmet());
 
+// Parse allowed origins from CLIENT_URL env var (comma-separated)
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+  : ['*'];
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || '*',
+    origin: allowedOrigins,
+    credentials: true,
 }));
 
 // Body parser

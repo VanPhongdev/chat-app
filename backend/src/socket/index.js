@@ -21,10 +21,16 @@ const socketAuth = (socket, next) => {
 };
 
 const initSocket = (server) => {
+  // Parse allowed origins from CLIENT_URL env var (comma-separated)
+  const allowedOrigins = process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+    : '*';
+
   const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || '*',
+      origin: allowedOrigins,
       methods: ['GET', 'POST'],
+      credentials: true,
     },
   });
 
